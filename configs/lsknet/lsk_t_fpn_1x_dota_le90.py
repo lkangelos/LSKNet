@@ -1,10 +1,10 @@
 _base_ = [
-    '../_base_/datasets/dotav1.py', '../_base_/schedules/schedule_1x.py',
+    '../_base_/datasets/dotav2.py', '../_base_/schedules/schedule_1x.py',
     '../_base_/default_runtime.py'
 ]
 
 angle_version = 'le90'
-gpu_number = 8
+gpu_number = 4
 # fp16 = dict(loss_scale='dynamic')
 model = dict(
     type='OrientedRCNN',
@@ -14,7 +14,7 @@ model = dict(
         drop_rate=0.1,
         drop_path_rate=0.1,
         depths=[3, 3, 5, 2],
-        init_cfg=dict(type='Pretrained', checkpoint="/data/pretrained/lsk_t_backbone.pth.tar"),
+        init_cfg=dict(type='Pretrained', checkpoint="/home/cike/dev/data/pretrained/lsk_t_backbone.pth.tar"),
         norm_cfg=dict(type='SyncBN', requires_grad=True)),
     neck=dict(
         type='FPN',
@@ -56,7 +56,7 @@ model = dict(
             in_channels=256,
             fc_out_channels=1024,
             roi_feat_size=7,
-            num_classes=15,
+            num_classes=18,
             bbox_coder=dict(
                 type='DeltaXYWHAOBBoxCoder',
                 angle_range=angle_version,
@@ -148,12 +148,14 @@ train_pipeline = [
     dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels'])
 ]
 
+classes = ('plane', 'baseball-diamond', 'bridge', 'ground-track-field', 'small-vehicle', 'large-vehicle', 'ship', 'tennis-court', 'basketball-court', 'storage-tank', 'soccer-ball-field', 'roundabout',
+         'harbor', 'swimming-pool', 'helicopter', 'container-crane', 'airport', 'helipad')
 data = dict(
-    samples_per_gpu=2,
+    samples_per_gpu=4,
     workers_per_gpu=2,
-    train=dict(pipeline=train_pipeline, version=angle_version),
-    val=dict(version=angle_version),
-    test=dict(version=angle_version))
+    train=dict(classes=classes, pipeline=train_pipeline, version=angle_version),
+    val=dict(classes=classes, version=angle_version),
+    test=dict(classes=classes, version=angle_version))
 
 optimizer = dict(
     _delete_=True,
