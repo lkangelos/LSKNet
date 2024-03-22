@@ -120,6 +120,9 @@ dmypy.json
 *work_dirs*
 tmp
 ckpts
+data
+data/
+work_dirs
 
 # custom
 mmrotate/.mim
